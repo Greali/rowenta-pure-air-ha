@@ -1,4 +1,4 @@
-"""Sensors: PM2.5, motor speed and filter counters."""
+"""Sensors: PM2.5, motor speed, filter time left and the auto-off time."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -11,13 +11,13 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import PERCENTAGE, CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, EntityCategory
+from homeassistant.const import CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, EntityCategory, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .coordinator import RowentaConfigEntry, RowentaCoordinator
 from .entity import RowentaEntity
-from .protocol import COUNTER_FULL, COUNTER_MINUTES_PER_UNIT, PurifierState
+from .protocol import COUNTER_MINUTES_PER_UNIT, FILTER_NAMES, PurifierState
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -27,36 +27,20 @@ class RowentaSensorDescription(SensorEntityDescription):
 
 
 def _filter_sensor(index: int) -> RowentaSensorDescription:
+    """Operating time left until a filter needs attention (the counter counts down from 1000)."""
+    name = FILTER_NAMES[index]
     return RowentaSensorDescription(
-        key=f"filter_{index + 1}",
-        translation_key=f"filter_{index + 1}",
+        key=f"filter_{name}",
+        translation_key=f"filter_{name}",
         icon="mdi:air-filter",
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        suggested_unit_of_measurement=UnitOfTime.DAYS,
+        suggested_display_precision=1,
         state_class=SensorStateClass.MEASUREMENT,
         entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda state: state.counters[index],
-    )
-
-
-def _filter_life_sensor(index: int) -> RowentaSensorDescription:
-    """Estimated remaining life of one filter: the counter counts down from 1000 (= 100 %)."""
-
-    def attrs(state: PurifierState) -> dict[str, float | int]:
-        counter = state.counters[index]
-        return {
-            "counter": counter,
-            "estimated_hours_remaining": round(counter * COUNTER_MINUTES_PER_UNIT[index] / 60),
-        }
-
-    return RowentaSensorDescription(
-        key=f"filter_{index + 1}_life",
-        translation_key=f"filter_{index + 1}_life",
-        icon="mdi:air-filter",
-        native_unit_of_measurement=PERCENTAGE,
-        suggested_display_precision=0,
-        state_class=SensorStateClass.MEASUREMENT,
-        entity_category=EntityCategory.DIAGNOSTIC,
-        value_fn=lambda state: min(state.counters[index], COUNTER_FULL) / (COUNTER_FULL / 100),
-        attrs_fn=attrs,
+        value_fn=lambda state: round(state.counters[index] * COUNTER_MINUTES_PER_UNIT[index] / 60, 1),
+        attrs_fn=lambda state: {"counter": state.counters[index]},
     )
 
 
@@ -76,10 +60,7 @@ SENSORS: tuple[RowentaSensorDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda state: state.speed,
     ),
-    # Four 16-bit counters (1000 = just reset). The order of the filters is not
-    # confirmed, which is why they are called "filter counter 1..4".
     *(_filter_sensor(i) for i in range(4)),
-    *(_filter_life_sensor(i) for i in range(4)),
 )
 
 

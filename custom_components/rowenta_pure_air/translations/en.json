@@ -110,32 +110,20 @@
       "fan_speed": {
         "name": "Motor speed"
       },
-      "filter_1": {
-        "name": "Filter counter 1"
-      },
-      "filter_2": {
-        "name": "Filter counter 2"
-      },
-      "filter_3": {
-        "name": "Filter counter 3"
-      },
-      "filter_4": {
-        "name": "Filter counter 4"
-      },
       "auto_off_at": {
         "name": "Auto-off at"
       },
-      "filter_1_life": {
-        "name": "Filter 1 life (estimate)"
+      "filter_prefilter": {
+        "name": "Pre-filter: time until cleaning"
       },
-      "filter_2_life": {
-        "name": "Filter 2 life (estimate)"
+      "filter_carbon": {
+        "name": "Activated carbon filter: time left"
       },
-      "filter_3_life": {
-        "name": "Filter 3 life (estimate)"
+      "filter_allergy": {
+        "name": "Allergy+ filter: time left"
       },
-      "filter_4_life": {
-        "name": "Filter 4 life (estimate)"
+      "filter_nanocaptur": {
+        "name": "NanoCaptur filter: time left"
       }
     },
     "number": {

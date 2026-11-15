@@ -7,6 +7,7 @@ from pathlib import Path
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.typing import ConfigType
 
 from .auto_off import AutoOffTimer
@@ -40,12 +41,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: RowentaConfigEntry) -> b
     coordinator = RowentaCoordinator(hass, entry, client)
     # If this fails (powered off, no network, unsupported device) HA retries by itself.
     await coordinator.async_config_entry_first_refresh()
+    _remove_replaced_entities(hass, entry)
     auto_off = AutoOffTimer(hass, coordinator)
     entry.runtime_data = RowentaData(client=client, coordinator=coordinator, auto_off=auto_off)
     entry.async_on_unload(coordinator.async_add_listener(auto_off.on_state_update))
     entry.async_on_unload(auto_off.cancel)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
+
+
+def _remove_replaced_entities(hass: HomeAssistant, entry: RowentaConfigEntry) -> None:
+    """Drop the raw filter counter / percentage sensors of earlier versions (replaced by time-left sensors)."""
+    registry = er.async_get(hass)
+    mac = entry.unique_id or entry.data[CONF_HOST]
+    for n in range(1, 5):
+        for key in (f"filter_{n}", f"filter_{n}_life"):
+            entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{mac}_{key}")
+            if entity_id:
+                registry.async_remove(entity_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: RowentaConfigEntry) -> bool:

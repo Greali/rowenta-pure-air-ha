@@ -24,8 +24,8 @@ its app and cloud. **You do not have to open or modify the appliance**: it uses 
 | PM2.5 | `sensor` | Reading of the appliance's particle sensor. |
 | Motor speed | `sensor` (diagnostic) | Depends on the mode (1 in silent/night, 2 in auto, 5 in turbo). |
 | Panel locked | `binary_sensor` (diagnostic) | Read-only. |
-| Filter 1 to 4 life (estimate) | `sensor` (diagnostic) | Remaining life in %, with the raw counter and an estimated number of hours left as attributes. See "Filter life". |
-| Filter counter 1 to 4 | `sensor` (diagnostic) | The raw 16-bit counters. |
+| Pre-filter: time until cleaning | `sensor` (diagnostic) | Operating time left, in days by default. See "Filter life". |
+| Activated carbon / Allergy+ / NanoCaptur: time left | `sensor` (diagnostic) | Operating time left until replacement. See "Filter life". |
 
 ## Installation
 
@@ -114,21 +114,25 @@ panel is locked (that would clear the lock) unless you allow it in *Options*.
 
 ## Filter life
 
-The status carries four 16-bit counters. After resetting the filter with the physical button, the first one
-went to 1000 and then decreased steadily while the purifier ran. In about 8 hours of continuous use (auto mode)
-they moved like this:
+The appliance keeps four 16-bit counters that count down from 1000 **only while it is running**. The integration turns
+them into **operating time left** for each filter (shown in days; each sensor also has the raw `counter` as an
+attribute). The rate of each counter was measured on a real unit over about 10 hours in auto mode:
 
-| Counter | Drops 1 unit every | Value when measured | Estimated hours left |
-|---|---|---|---|
-| 1 | ~21 min | 974 | ~340 h |
-| 2 | ~135 min | 160 | ~360 h |
-| 3 | ~271 min (half as fast as 2) | 51 | ~230 h |
-| 4 | ~135 min (always equal to 2) | 160 | ~360 h |
+| Counter | Filter (inferred) | Drops 1 unit every | Full life (1000 units) | Manual's interval |
+|---|---|---|---|---|
+| 1 | Pre-filter (clean it) | ~21 min | ~14 days | clean every 2 to 4 weeks |
+| 2 | Activated carbon | ~135 min | ~94 days | replace every 12 months |
+| 3 | Allergy+ | ~271 min | ~188 days | replace every 2 years |
+| 4 | NanoCaptur | ~135 min (always equal to counter 2) | ~94 days | replace when its color changes |
 
-The *Filter N life (estimate)* sensors assume the counters start at 1000 (= 100 %) and use these measured rates
-for the hours. **Treat them as estimates**: only counter 1 was seen at 1000 right after a reset; the rates were
-measured in auto mode only and may depend on the mode; it is not confirmed which counter belongs to which
-filter (pre-filter, activated carbon, Allergy+, NanoCaptur) nor whether time counts while the purifier is off.
+The manual's intervals assume 8 hours of use per day; the counters run faster than that (they behave as if the
+appliance ran all day), so **read the numbers as "days of continuous operation left"**. Counter 3 is exactly
+half as fast as counter 2, which matches the manual's 12 and 24 months, and counter 1 matches the pre-filter
+being the short one; that is how the counters were assigned to filters. **It is an inference**: counters 2 and 4
+behave identically, so which of them is the carbon and which the NanoCaptur is a guess (the two would only swap names).
+Only counter 1 changed when the filters were reset with the physical button (from 0 to 1000); the others had not
+reached 0 and were left as they were.
+
 Resetting a filter is only possible with the physical button (hold FILTER ~3 s).
 
 ## Which option should I choose?
@@ -156,7 +160,7 @@ put it on your Wi-Fi without cloud or hardware changes, and the status/write det
 * It is **not possible** to set the lock, program the appliance's own timer or reset the filters over the network
   (the timer does not even appear in the status; the lock and the reset did not accept any tested write).
 * There is **no manual speed**: on this model the speed depends on the mode.
-* **Filter life** is an estimate, see "Filter life".
+* **Filter life** is inferred from measurements, see "Filter life".
 * The purifier must be on the **same local network** as Home Assistant (the scan sweeps the /24).
 * PM2.5 is published as µg/m³; the exact unit is not confirmed.
 

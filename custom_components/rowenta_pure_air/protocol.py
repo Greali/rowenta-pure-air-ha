@@ -50,9 +50,12 @@ LIGHT_IDS: dict[str, int] = {name: ident for ident, name in LIGHTS.items()}
 # 1000 right after resetting the filter with the physical button, then it decreases with use.
 # The order of the filters is NOT confirmed.
 COUNTER_OFFSETS = (9, 13, 17, 21)
-# Measured over ~8 h of continuous use in auto mode: minutes of operation per counter unit
-# (the counters count down from 1000). Counters 2 and 4 always moved together; counter 3 is half as fast
-# as them. Empirical values, not from documentation: treat the derived times as estimates.
+# The counters count down from 1000 and only while the purifier is ON. Measured over ~10 h of use in auto mode:
+# minutes of operation per counter unit. Counters 2 and 4 always moved together; counter 3 is exactly half as
+# fast. That matches the manual's intervals (activated carbon 12 months, Allergy+ 24 months), which is why the
+# counters are assigned to the filters as below. The assignment of 2 vs 4 (carbon / NanoCaptur) is a guess,
+# and all derived times are estimates.
+FILTER_NAMES = ("prefilter", "carbon", "allergy", "nanocaptur")
 COUNTER_FULL = 1000
 COUNTER_MINUTES_PER_UNIT = (20.8, 135.4, 270.7, 135.4)
 
