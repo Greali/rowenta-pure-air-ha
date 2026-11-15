@@ -1,4 +1,4 @@
-"""Local integration for the Rowenta Intense Pure Air Connect (PU4080) purifier."""
+"""Local integration for the Rowenta Intense Pure Air Connect purifier (tested on the PU4080)."""
 from __future__ import annotations
 
 import logging
@@ -9,13 +9,14 @@ from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
+from .auto_off import AutoOffTimer
 from .const import DOMAIN, STATIC_URL
 from .coordinator import RowentaConfigEntry, RowentaCoordinator, RowentaData
 from .protocol import RowentaClient
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.FAN, Platform.SELECT, Platform.SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.FAN, Platform.NUMBER, Platform.SELECT, Platform.SENSOR]
 _TOOL_FLAG = f"{DOMAIN}_tool_served"
 
 
@@ -39,7 +40,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: RowentaConfigEntry) -> b
     coordinator = RowentaCoordinator(hass, entry, client)
     # If this fails (powered off, no network, unsupported device) HA retries by itself.
     await coordinator.async_config_entry_first_refresh()
-    entry.runtime_data = RowentaData(client=client, coordinator=coordinator)
+    auto_off = AutoOffTimer(hass, coordinator)
+    entry.runtime_data = RowentaData(client=client, coordinator=coordinator, auto_off=auto_off)
+    entry.async_on_unload(coordinator.async_add_listener(auto_off.on_state_update))
+    entry.async_on_unload(auto_off.cancel)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 

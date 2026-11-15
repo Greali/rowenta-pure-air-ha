@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -62,6 +63,7 @@ async def async_setup_entry(
 ) -> None:
     coordinator = entry.runtime_data.coordinator
     async_add_entities(RowentaSensor(coordinator, description) for description in SENSORS)
+    async_add_entities([RowentaAutoOffAt(coordinator, entry.runtime_data.auto_off)])
 
 
 class RowentaSensor(RowentaEntity, SensorEntity):
@@ -74,3 +76,18 @@ class RowentaSensor(RowentaEntity, SensorEntity):
     @property
     def native_value(self) -> int | None:
         return self.entity_description.value_fn(self.state_data)
+
+
+class RowentaAutoOffAt(RowentaEntity, SensorEntity):
+    """When the auto-off timer will turn the purifier off (empty if no timer is running)."""
+
+    _attr_translation_key = "auto_off_at"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, coordinator: RowentaCoordinator, timer) -> None:
+        super().__init__(coordinator, "auto_off_at")
+        self._timer = timer
+
+    @property
+    def native_value(self) -> datetime | None:
+        return self._timer.ends_at

@@ -4,15 +4,22 @@
 its app and cloud. **You do not have to open or modify the appliance**: it uses its original Wi-Fi module
 (Broadlink, `devtype 0x4f9a`, name `supor_air`).
 
-> Status: **initial version (0.1.0)**. The protocol and the Wi-Fi setup wizard have been tested against a real
-> PU4080. **The integration has not been tested yet on a real Home Assistant installation** with the appliance
-> connected. Other models of the PU408x series may work, but are untested.
+> Status: **early version**. Developed and tested on a real **PU4080**: the protocol, the Wi-Fi setup wizard and the
+> installation through HACS into a real Home Assistant (device added, panel light changed from Home Assistant).
+>
+> **Other models:** the integration recognises the appliance by its Wi-Fi module (Broadlink `devtype 0x4f9a`,
+> `supor_air`), not by its name, so **other Rowenta purifiers of the same "Pure Air Connect" family that use
+> that module may work too**. They are untested: if you try one, please open an issue
+> telling whether it worked. A device with a different module type is not accepted.
 
 ## What it provides
 
 | Entity | Type | Notes |
 |---|---|---|
-| Purifier | `fan` | Power on/off and modes: silent, night, auto, turbo. |
+| Purifier | `fan` | Power on/off and modes (presets): silent, night, auto, turbo. |
+| Mode | `select` | The same four modes as a dropdown, shown in the device's controls. |
+| Auto-off timer | `number` | Minutes until the purifier is turned off (0 = no timer). Runs in Home Assistant, see below. |
+| Auto-off at | `sensor` | When the timer will turn the purifier off. |
 | Panel light | `select` | On / dim / off. In night mode the appliance turns the indicators off by itself. |
 | PM2.5 | `sensor` | Reading of the appliance's particle sensor. |
 | Motor speed | `sensor` (diagnostic) | Depends on the mode (1 in silent/night, 2 in auto, 5 in turbo). |
@@ -96,10 +103,18 @@ the network clears the lock, and it cannot be set again over the network.** That
 panel is locked, the integration **warns instead of turning off** (this can be allowed in *Options*). To unlock by
 hand: hold the LOCK button for 3 s.
 
+## Auto-off timer
+
+The appliance's own timer cannot be programmed over the network (it is not part of the status and no write was
+accepted), so the integration offers a **timer that runs inside Home Assistant**: set *Auto-off timer* to N
+minutes and Home Assistant turns the purifier off when it expires. It is cancelled if you set it to 0 or the
+purifier is turned off, it is **lost if Home Assistant restarts**, and it never turns the purifier off while the
+panel is locked (that would clear the lock) unless you allow it in *Options*.
+
 ## Known limitations
 
-* It is **not possible** to set the lock, program the timer or reset the filters over the network (the timer does not
-  even appear in the status; the lock and the reset did not accept any tested write).
+* It is **not possible** to set the lock, program the appliance's own timer or reset the filters over the network
+  (the timer does not even appear in the status; the lock and the reset did not accept any tested write).
 * There is **no manual speed**: on this model the speed depends on the mode.
 * **Filter counters.** The status carries four 16-bit counters. After resetting the filter with the physical
   button, the first one went from 0 to 1000 and decreases with use; the other three did not move. **The order of

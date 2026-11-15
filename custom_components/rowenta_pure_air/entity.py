@@ -26,7 +26,7 @@ class RowentaEntity(CoordinatorEntity[RowentaCoordinator]):
             identifiers={(DOMAIN, mac)},
             connections={(CONNECTION_NETWORK_MAC, mac)},
             manufacturer="Rowenta",
-            model="Intense Pure Air Connect (PU4080)",
+            model="Intense Pure Air Connect",
             name=coordinator.config_entry.title,
         )
 

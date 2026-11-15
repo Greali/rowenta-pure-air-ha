@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import Any
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
@@ -43,6 +44,7 @@ class RowentaData:
 
     client: RowentaClient
     coordinator: RowentaCoordinator
+    auto_off: Any = None  # AutoOffTimer (typed loosely to avoid a circular import)
 
 
 type RowentaConfigEntry = ConfigEntry[RowentaData]

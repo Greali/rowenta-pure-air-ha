@@ -83,6 +83,15 @@
       }
     },
     "select": {
+      "mode": {
+        "name": "Modo",
+        "state": {
+          "silent": "Silencioso",
+          "night": "Noche",
+          "auto": "Automático",
+          "turbo": "Turbo"
+        }
+      },
       "panel_light": {
         "name": "Luz del panel",
         "state": {
@@ -112,6 +121,14 @@
       },
       "filter_4": {
         "name": "Contador de filtro 4"
+      },
+      "auto_off_at": {
+        "name": "Se apagará a las"
+      }
+    },
+    "number": {
+      "auto_off": {
+        "name": "Temporizador de apagado"
       }
     }
   },
@@ -121,6 +138,9 @@
     },
     "command_failed": {
       "message": "No se pudo enviar la orden al purificador: {error}"
+    },
+    "purifier_off": {
+      "message": "El purificador está apagado: enciéndelo primero."
     }
   }
 }

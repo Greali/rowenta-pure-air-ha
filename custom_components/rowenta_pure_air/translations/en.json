@@ -83,6 +83,15 @@
       }
     },
     "select": {
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "silent": "Silent",
+          "night": "Night",
+          "auto": "Auto",
+          "turbo": "Turbo"
+        }
+      },
       "panel_light": {
         "name": "Panel light",
         "state": {
@@ -112,6 +121,14 @@
       },
       "filter_4": {
         "name": "Filter counter 4"
+      },
+      "auto_off_at": {
+        "name": "Auto-off at"
+      }
+    },
+    "number": {
+      "auto_off": {
+        "name": "Auto-off timer"
       }
     }
   },
@@ -121,6 +138,9 @@
     },
     "command_failed": {
       "message": "Could not send the command to the purifier: {error}"
+    },
+    "purifier_off": {
+      "message": "The purifier is off: turn it on first."
     }
   }
 }
