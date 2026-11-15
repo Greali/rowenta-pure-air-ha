@@ -1,0 +1,14 @@
+{
+  "domain": "rowenta_pure_air",
+  "name": "Rowenta Pure Air (local)",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["http", "network"],
+  "dhcp": [{ "macaddress": "780F77*" }],
+  "documentation": "https://github.com/Greali/rowenta-pure-air-ha",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/Greali/rowenta-pure-air-ha/issues",
+  "requirements": ["broadlink>=0.19.0"],
+  "version": "0.1.0"
+}

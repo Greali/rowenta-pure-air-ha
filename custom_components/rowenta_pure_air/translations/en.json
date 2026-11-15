@@ -1,0 +1,126 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add a Rowenta purifier",
+        "description": "Where is your purifier at?",
+        "menu_options": {
+          "wifi_ap": "It is not on my Wi-Fi yet (guide me step by step)",
+          "discover": "It is already on my Wi-Fi: search for it",
+          "manual": "It is already on my Wi-Fi: I will enter its IP address"
+        }
+      },
+      "wifi_ap": {
+        "title": "Connect to your Wi-Fi · Step 1 of 3: pairing mode",
+        "description": "Put the purifier in pairing mode:\n\n1. Plug it in and switch it on.\n2. Hold the **Wi-Fi** button for about **3 seconds**.\n3. The appliance's Wi-Fi icon should **blink fast**: that means it is in pairing mode. If it does not, repeat the press.\n\nIn that mode the purifier creates its own Wi-Fi network, named like **AIR PURIFIER XXXX** (the last four characters differ from one appliance to another). Its password is on the appliance **label**."
+      },
+      "wifi_tool": {
+        "title": "Connect to your Wi-Fi · Step 3 of 3: send your Wi-Fi to the purifier",
+        "description": "With the computer **already connected to the purifier's network**, open the wizard that will send it your Wi-Fi. It guides you through its own screens, **needs no administrator rights** and sends nothing to the Internet.\n\n**On Windows:** download **{exe_name}** from the [downloads page]({releases_url}) and open it (no installation needed). If Windows shows 'Windows protected your PC', click *More info → Run anyway*: the program is not signed.\n\n**On macOS or Linux:** download [{tool_name}]({tool_url}) (right click → *Save link as…*) and run it with `python3 {tool_name}` (needs [Python 3](https://www.python.org/downloads/)).\n\nThe wizard checks that you are on the purifier's network and asks for your **Wi-Fi name and password**. Your Wi-Fi must be **2.4 GHz with WPA2 security** (mixed WPA2/WPA3 is fine) and **without Smart Connect** (one name for 2.4 and 5 GHz): in testing the purifier could not join with it enabled. At the end it **checks that the purifier shows up on your network** and shows its IP.\n\n**How do I know it worked?** The purifier's Wi-Fi icon turns **solid** and the wizard says 'Done!'. If it blinks slowly and turns off, it could not join: check 2.4 GHz, WPA2 and Smart Connect, and start over from step 1.\n\nWhen the wizard says 'Done!', come back here and press **Submit**."
+      },
+      "discover": {
+        "title": "Search for the purifier",
+        "description": "I will search your local network for the purifier. It takes about 10 seconds. Press **Submit** to start."
+      },
+      "pick": {
+        "title": "Choose the purifier",
+        "description": "I found these purifiers on your network:",
+        "data": {
+          "host": "Purifier"
+        }
+      },
+      "manual": {
+        "title": "Purifier IP address",
+        "description": "Enter the IP address your router gave it. We recommend **reserving** it in the router so it does not change.",
+        "data": {
+          "host": "IP address"
+        }
+      },
+      "dhcp_confirm": {
+        "title": "Rowenta purifier detected",
+        "description": "I detected a Rowenta purifier at **{host}**. Do you want to add it?"
+      },
+      "wifi_connect": {
+        "title": "Connect to your Wi-Fi · Step 2 of 3: connect a computer to the purifier's network",
+        "description": "Home Assistant cannot join the purifier's network, so you will use a **computer with Wi-Fi** (the same one on which you will open the wizard in the next step). Connect it to that network now:\n\n1. From the computer's Wi-Fi icon, look for a network called **AIR PURIFIER** followed by four characters, for example **AIR PURIFIER XXXX**.\n2. Connect using the password on the purifier's label.\n\n- If the system warns that there is **no Internet**, that is normal: stay connected.\n- If Windows jumps back to your home Wi-Fi, untick *Connect automatically* on that network while this runs.\n- If you cannot see the network, check that the purifier's Wi-Fi icon is still blinking fast.\n\nWhile the computer is on that network it will have no Internet; this is temporary."
+      }
+    },
+    "error": {
+      "not_found": "No purifier found. Check that the appliance's Wi-Fi icon is solid and that Home Assistant is on the same network, or use the option to enter the IP.",
+      "cannot_connect": "Could not talk to a compatible purifier at that address."
+    },
+    "abort": {
+      "already_configured": "This purifier is already configured.",
+      "not_supported": "The detected device is not a supported purifier."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "allow_off_when_locked": "Allow turning off while the panel is locked"
+        },
+        "data_description": {
+          "allow_off_when_locked": "Turning off over the network cancels the panel lock and it cannot be re-enabled over the network. When disabled, a warning is shown instead of turning off."
+        }
+      }
+    }
+  },
+  "entity": {
+    "fan": {
+      "purifier": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "silent": "Silent",
+              "night": "Night",
+              "auto": "Auto",
+              "turbo": "Turbo"
+            }
+          }
+        }
+      }
+    },
+    "select": {
+      "panel_light": {
+        "name": "Panel light",
+        "state": {
+          "on": "On",
+          "dim": "Dim",
+          "off": "Off"
+        }
+      }
+    },
+    "binary_sensor": {
+      "panel_lock": {
+        "name": "Panel locked"
+      }
+    },
+    "sensor": {
+      "fan_speed": {
+        "name": "Motor speed"
+      },
+      "filter_1": {
+        "name": "Filter counter 1"
+      },
+      "filter_2": {
+        "name": "Filter counter 2"
+      },
+      "filter_3": {
+        "name": "Filter counter 3"
+      },
+      "filter_4": {
+        "name": "Filter counter 4"
+      }
+    }
+  },
+  "exceptions": {
+    "panel_locked": {
+      "message": "The purifier's panel is locked and turning it off over the network would remove the lock (it cannot be re-enabled over the network). Unlock it with the LOCK button, or allow turning off while locked in the integration options."
+    },
+    "command_failed": {
+      "message": "Could not send the command to the purifier: {error}"
+    }
+  }
+}

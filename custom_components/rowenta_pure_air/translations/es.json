@@ -1,0 +1,126 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Añadir un purificador Rowenta",
+        "description": "¿En qué punto está tu purificador?",
+        "menu_options": {
+          "wifi_ap": "Aún no está conectado a mi Wi-Fi (te guío paso a paso)",
+          "discover": "Ya está conectado a mi Wi-Fi: búscalo",
+          "manual": "Ya está conectado: introduciré su dirección IP"
+        }
+      },
+      "wifi_ap": {
+        "title": "Conectar a tu Wi-Fi · Paso 1 de 3: modo emparejamiento",
+        "description": "Pon el purificador en modo emparejamiento:\n\n1. Enchúfalo y enciéndelo.\n2. Mantén pulsado el botón **Wi-Fi** durante unos **3 segundos**.\n3. El icono Wi-Fi del aparato debe **parpadear rápido**: es la señal de que está en modo emparejamiento. Si no lo hace, repite la pulsación.\n\nEn ese modo el purificador crea su propia red Wi-Fi, con un nombre como **AIR PURIFIER XXXX** (las cuatro últimas cifras cambian de un aparato a otro). Su contraseña está en la **etiqueta** del aparato."
+      },
+      "wifi_tool": {
+        "title": "Conectar a tu Wi-Fi · Paso 3 de 3: enviar tu Wi-Fi al purificador",
+        "description": "Con el ordenador **ya conectado a la red del purificador**, abre el asistente que le enviará tu Wi-Fi. Te guía con sus propias pantallas, **no necesita permisos de administrador** y no envía nada a Internet.\n\n**En Windows:** descarga **{exe_name}** desde la [página de descargas]({releases_url}) y ábrelo (no hace falta instalarlo). Si Windows muestra «Windows protegió su PC», pulsa *Más información → Ejecutar de todas formas*: el programa no está firmado.\n\n**En macOS o Linux:** descarga [{tool_name}]({tool_url}) (clic derecho → *Guardar enlace como…*) y ejecútalo con `python3 {tool_name}` ([Python 3](https://www.python.org/downloads/) instalado).\n\nEl asistente comprueba que estás en la red del purificador y te pide el **nombre y la contraseña de tu Wi-Fi**. Tu Wi-Fi debe ser de **2,4 GHz con seguridad WPA2** (vale la mixta WPA2/WPA3) y **sin Smart Connect** (un único nombre para 2,4 y 5 GHz): en las pruebas, el purificador no conseguía unirse con eso activado. Al final **comprueba que el purificador aparece en tu red** y te muestra su IP.\n\n**¿Cómo sé que ha funcionado?** El icono Wi-Fi del purificador pasa a **fijo** y el asistente dice «¡Listo!». Si parpadea despacio y se apaga, no ha podido unirse: revisa 2,4 GHz, WPA2 y Smart Connect, y empieza de nuevo desde el paso 1.\n\nCuando el asistente diga «¡Listo!», vuelve aquí y pulsa **Enviar**."
+      },
+      "discover": {
+        "title": "Buscar el purificador",
+        "description": "Voy a buscar el purificador en tu red local. Tarda unos 10 segundos. Pulsa **Enviar** para empezar."
+      },
+      "pick": {
+        "title": "Elige el purificador",
+        "description": "He encontrado estos purificadores en tu red:",
+        "data": {
+          "host": "Purificador"
+        }
+      },
+      "manual": {
+        "title": "Dirección IP del purificador",
+        "description": "Introduce la IP que le ha dado tu router. Te recomendamos **reservarla** en el router para que no cambie.",
+        "data": {
+          "host": "Dirección IP"
+        }
+      },
+      "dhcp_confirm": {
+        "title": "Purificador Rowenta detectado",
+        "description": "He detectado un purificador Rowenta en **{host}**. ¿Quieres añadirlo?"
+      },
+      "wifi_connect": {
+        "title": "Conectar a tu Wi-Fi · Paso 2 de 3: conecta un ordenador a la red del purificador",
+        "description": "Home Assistant no puede unirse a la red del purificador, así que usarás un **ordenador con Wi-Fi** (el mismo en el que abrirás el asistente del siguiente paso). Conéctalo ahora a esa red:\n\n1. En el icono de Wi-Fi del ordenador, busca una red llamada **AIR PURIFIER** seguida de cuatro caracteres, por ejemplo **AIR PURIFIER XXXX**.\n2. Conéctate con la contraseña de la etiqueta del purificador.\n\n- Si el sistema avisa de que **no hay Internet**, es normal: mantén la conexión.\n- Si Windows vuelve solo a tu Wi-Fi de casa, desmarca *Conectar automáticamente* en esa red mientras dura el proceso.\n- Si no ves la red, comprueba que el icono Wi-Fi del purificador sigue parpadeando rápido.\n\nMientras el ordenador esté en esa red no tendrá Internet; es temporal."
+      }
+    },
+    "error": {
+      "not_found": "No he encontrado ningún purificador. Comprueba que el icono Wi-Fi del aparato está fijo y que Home Assistant está en la misma red; o usa la opción de introducir la IP.",
+      "cannot_connect": "No he podido hablar con un purificador compatible en esa dirección."
+    },
+    "abort": {
+      "already_configured": "Este purificador ya está configurado.",
+      "not_supported": "El dispositivo detectado no es un purificador compatible."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opciones",
+        "data": {
+          "allow_off_when_locked": "Permitir apagar con el panel bloqueado"
+        },
+        "data_description": {
+          "allow_off_when_locked": "Apagar por red cancela el bloqueo del panel y no se puede volver a activar por red. Si está desactivado, se avisa en lugar de apagar."
+        }
+      }
+    }
+  },
+  "entity": {
+    "fan": {
+      "purifier": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "silent": "Silencioso",
+              "night": "Noche",
+              "auto": "Automático",
+              "turbo": "Turbo"
+            }
+          }
+        }
+      }
+    },
+    "select": {
+      "panel_light": {
+        "name": "Luz del panel",
+        "state": {
+          "on": "Encendida",
+          "dim": "Tenue",
+          "off": "Apagada"
+        }
+      }
+    },
+    "binary_sensor": {
+      "panel_lock": {
+        "name": "Panel bloqueado"
+      }
+    },
+    "sensor": {
+      "fan_speed": {
+        "name": "Velocidad del motor"
+      },
+      "filter_1": {
+        "name": "Contador de filtro 1"
+      },
+      "filter_2": {
+        "name": "Contador de filtro 2"
+      },
+      "filter_3": {
+        "name": "Contador de filtro 3"
+      },
+      "filter_4": {
+        "name": "Contador de filtro 4"
+      }
+    }
+  },
+  "exceptions": {
+    "panel_locked": {
+      "message": "El panel del purificador está bloqueado y apagarlo por red quitaría el bloqueo (no se puede volver a activar por red). Desbloquéalo con el botón LOCK, o permite apagar con el panel bloqueado en las opciones de la integración."
+    },
+    "command_failed": {
+      "message": "No se pudo enviar la orden al purificador: {error}"
+    }
+  }
+}
