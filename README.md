@@ -24,7 +24,8 @@ its app and cloud. **You do not have to open or modify the appliance**: it uses 
 | PM2.5 | `sensor` | Reading of the appliance's particle sensor. |
 | Motor speed | `sensor` (diagnostic) | Depends on the mode (1 in silent/night, 2 in auto, 5 in turbo). |
 | Panel locked | `binary_sensor` (diagnostic) | Read-only. |
-| Filter counter 1 to 4 | `sensor` (diagnostic) | See "Known limitations". |
+| Filter 1 to 4 life (estimate) | `sensor` (diagnostic) | Remaining life in %, with the raw counter and an estimated number of hours left as attributes. See "Filter life". |
+| Filter counter 1 to 4 | `sensor` (diagnostic) | The raw 16-bit counters. |
 
 ## Installation
 
@@ -111,15 +112,51 @@ minutes and Home Assistant turns the purifier off when it expires. It is cancell
 purifier is turned off, it is **lost if Home Assistant restarts**, and it never turns the purifier off while the
 panel is locked (that would clear the lock) unless you allow it in *Options*.
 
+## Filter life
+
+The status carries four 16-bit counters. After resetting the filter with the physical button, the first one
+went to 1000 and then decreased steadily while the purifier ran. In about 8 hours of continuous use (auto mode)
+they moved like this:
+
+| Counter | Drops 1 unit every | Value when measured | Estimated hours left |
+|---|---|---|---|
+| 1 | ~21 min | 974 | ~340 h |
+| 2 | ~135 min | 160 | ~360 h |
+| 3 | ~271 min (half as fast as 2) | 51 | ~230 h |
+| 4 | ~135 min (always equal to 2) | 160 | ~360 h |
+
+The *Filter N life (estimate)* sensors assume the counters start at 1000 (= 100 %) and use these measured rates
+for the hours. **Treat them as estimates**: only counter 1 was seen at 1000 right after a reset; the rates were
+measured in auto mode only and may depend on the mode; it is not confirmed which counter belongs to which
+filter (pre-filter, activated carbon, Allergy+, NanoCaptur) nor whether time counts while the purifier is off.
+Resetting a filter is only possible with the physical button (hold FILTER ~3 s).
+
+## Which option should I choose?
+
+There are three ways to bring this purifier back after the cloud shutdown. They are not equivalent:
+
+| | This project | [acvx93/rowenta-pure-air-cloud-rescue](https://github.com/acvx93/rowenta-pure-air-cloud-rescue) | [vpxavier/rowenta-esp32-mqtt-bridge](https://github.com/vpxavier/rowenta-esp32-mqtt-bridge) |
+|---|---|---|---|
+| Opening / soldering the appliance | **No** (keeps the original Wi-Fi module) | Yes: ESP32-S3 replaces the module | Yes: ESP32 on the UART plus transistors on the buttons |
+| Needs Home Assistant | Yes | No (local web page, voice control) | No (built-in web interface, optional Home Assistant via MQTT) |
+| On-device schedules | No (a timer that runs in Home Assistant) | Yes | See its README |
+| Tested model | PU4080 | PU4080 | PU6080 (XL) |
+
+If you are comfortable soldering and want schedules stored in the appliance itself, the ESP32 projects are the
+better fit. If you would rather not open the purifier and already use Home Assistant, this project is an
+alternative. Details of the other projects may have changed: check their READMEs.
+
+**Credit:** the format of the MCU's UART frames and the command layout come from the documentation of
+[acvx93/rowenta-pure-air-cloud-rescue](https://github.com/acvx93/rowenta-pure-air-cloud-rescue). What this
+project adds is how to reach that UART through the original Broadlink module (command `0x6A`), how to
+put it on your Wi-Fi without cloud or hardware changes, and the status/write details found by testing on a real unit.
+
 ## Known limitations
 
 * It is **not possible** to set the lock, program the appliance's own timer or reset the filters over the network
   (the timer does not even appear in the status; the lock and the reset did not accept any tested write).
 * There is **no manual speed**: on this model the speed depends on the mode.
-* **Filter counters.** The status carries four 16-bit counters. After resetting the filter with the physical
-  button, the first one went from 0 to 1000 and decreases with use; the other three did not move. **The order of
-  the filters (pre-filter, carbon, Allergy+, NanoCaptur) and the unit are not confirmed**, which is why they are
-  called "Filter counter 1 to 4" and there are no remaining-life estimates yet.
+* **Filter life** is an estimate, see "Filter life".
 * The purifier must be on the **same local network** as Home Assistant (the scan sweeps the /24).
 * PM2.5 is published as µg/m³; the exact unit is not confirmed.
 

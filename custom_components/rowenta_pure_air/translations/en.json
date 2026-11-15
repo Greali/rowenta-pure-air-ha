@@ -124,6 +124,18 @@
       },
       "auto_off_at": {
         "name": "Auto-off at"
+      },
+      "filter_1_life": {
+        "name": "Filter 1 life (estimate)"
+      },
+      "filter_2_life": {
+        "name": "Filter 2 life (estimate)"
+      },
+      "filter_3_life": {
+        "name": "Filter 3 life (estimate)"
+      },
+      "filter_4_life": {
+        "name": "Filter 4 life (estimate)"
       }
     },
     "number": {

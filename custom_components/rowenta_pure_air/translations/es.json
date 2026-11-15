@@ -124,6 +124,18 @@
       },
       "auto_off_at": {
         "name": "Se apagará a las"
+      },
+      "filter_1_life": {
+        "name": "Vida del filtro 1 (estimada)"
+      },
+      "filter_2_life": {
+        "name": "Vida del filtro 2 (estimada)"
+      },
+      "filter_3_life": {
+        "name": "Vida del filtro 3 (estimada)"
+      },
+      "filter_4_life": {
+        "name": "Vida del filtro 4 (estimada)"
       }
     },
     "number": {
