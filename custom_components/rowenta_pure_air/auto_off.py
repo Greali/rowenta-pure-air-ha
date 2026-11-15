@@ -38,6 +38,9 @@ class AutoOffTimer:
             self.minutes = minutes
             self.ends_at = dt_util.utcnow() + timedelta(minutes=minutes)
             self._unsub = async_call_later(self._hass, timedelta(minutes=minutes), self._expired)
+            _LOGGER.info("Auto-off timer started: %s min (ends at %s)", minutes, self.ends_at)
+        else:
+            _LOGGER.debug("Auto-off timer cleared")
         self._coordinator.async_update_listeners()
 
     @callback
@@ -57,9 +60,17 @@ class AutoOffTimer:
         """Called on every coordinator update: a purifier that is already off needs no timer."""
         data = self._coordinator.data
         if self.ends_at is not None and data is not None and not data.on:
+            _LOGGER.info("Auto-off timer cancelled: the purifier reports being off")
             self.cancel()
 
-    async def _expired(self, _now: datetime) -> None:
+    async def _expired(self, now: datetime) -> None:
+        # Safety net: never turn the purifier off before the time the user asked for.
+        if self.ends_at is not None and now < self.ends_at - timedelta(seconds=5):
+            remaining = self.ends_at - now
+            _LOGGER.warning("Auto-off timer fired %s early: ignoring and rescheduling", remaining)
+            self._unsub = async_call_later(self._hass, remaining, self._expired)
+            return
+        _LOGGER.info("Auto-off timer expired: turning the purifier off")
         self._unsub = None
         self.minutes = 0
         self.ends_at = None
