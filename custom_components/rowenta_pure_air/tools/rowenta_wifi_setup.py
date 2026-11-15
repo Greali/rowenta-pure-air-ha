@@ -12,13 +12,15 @@ Steps: 1) put the purifier in pairing mode, 2) connect this computer to its
 in one outgoing UDP packet), 4) check that the purifier shows up on your network.
 Nothing is sent to the Internet, the password is not stored and saved Windows passwords are not read.
 
-The interface is in English. Set the environment variable ROWENTA_WIFI_LANG=es for Spanish.
+The interface is in Spanish or English, following the Windows display language (English otherwise).
+Force it with the environment variable ROWENTA_WIFI_LANG=es or =en.
 """
 from __future__ import annotations
 
 import datetime as dt
 import getpass
 import ipaddress
+import locale
 import os
 import queue
 import re
@@ -237,8 +239,28 @@ TEXTS: dict[str, dict[str, str]] = {
 
 
 def detect_language() -> str:
-    """English by default; Spanish only when ROWENTA_WIFI_LANG=es is set."""
-    return "es" if os.environ.get("ROWENTA_WIFI_LANG", "").lower().startswith("es") else "en"
+    """Spanish or English. Override with ROWENTA_WIFI_LANG; otherwise the Windows display language
+    (or the system locale elsewhere). Anything that is not Spanish gets English."""
+    forced = os.environ.get("ROWENTA_WIFI_LANG", "").strip().lower()
+    if forced:
+        return "es" if forced.startswith("es") else "en"
+    if sys.platform == "win32":
+        try:
+            import ctypes  # noqa: PLC0415
+
+            primary = ctypes.windll.kernel32.GetUserDefaultUILanguage() & 0x3FF  # LANG_SPANISH = 0x0A
+            return "es" if primary == 0x0A else "en"
+        except Exception:  # noqa: BLE001 - fall back to the locale below
+            pass
+    names = [os.environ.get("LC_ALL", ""), os.environ.get("LANG", "")]
+    try:
+        names.append(locale.getlocale()[0] or "")
+    except Exception:  # noqa: BLE001
+        pass
+    for name in names:
+        if name.lower().startswith(("es", "spanish")):
+            return "es"
+    return "en"
 
 
 # --------------------------------------------------------------------------- core (no windows)

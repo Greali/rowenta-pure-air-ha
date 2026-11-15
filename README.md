@@ -53,7 +53,7 @@ adds it.
 
 ### Wi-Fi wizard for Windows (`RowentaWifiSetup.exe`)
 
-A single `.exe` (English interface), **no installation and no administrator rights** (the manifest requests
+A single `.exe` (Spanish or English, following your Windows display language), **no installation and no administrator rights** (the manifest requests
 `asInvoker`; it only sends one outgoing UDP packet and reads the current Wi-Fi network name). It guides you through
 four steps and a final screen:
 
@@ -70,8 +70,9 @@ four steps and a final screen:
 * **Windows SmartScreen:** since it is not signed, it may show "Windows protected your PC". Click *More info →
   Run anyway*. Some antivirus programs distrust `.exe` files built with PyInstaller: compare the **SHA-256**
   published next to the file, or use the Python script.
+* The Home Assistant screens follow Home Assistant's own language (English and Spanish are included).
 * **macOS / Linux, or if you prefer not to use the `.exe`:** `python3 rowenta_wifi_setup.py` (the same windowed
-  wizard; `--cli` for the text version; `ROWENTA_WIFI_LANG=es` switches it to Spanish). It only uses the Python
+  wizard; `--cli` for the text version; `ROWENTA_WIFI_LANG=es` / `=en` forces the language). It only uses the Python
   standard library.
 * **Build the `.exe` yourself:** `powershell -ExecutionPolicy Bypass -File scripts\build_windows_exe.ps1`
   (output in `dist\RowentaWifiSetup.exe`). The script prints its SHA-256 so you can compare it with the release's.
