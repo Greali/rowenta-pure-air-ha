@@ -116,7 +116,7 @@ panel is locked (that would clear the lock) unless you allow it in *Options*.
 
 The appliance keeps four 16-bit counters that count down from 1000 **only while it is running**. The integration turns
 them into **operating time left** for each filter (shown in days; each sensor also has the raw `counter` as an
-attribute). The rate of each counter was measured on a real unit over about 10 hours in auto mode:
+attribute). The rate of each counter was measured on a real unit over about 15 hours in auto mode:
 
 | Counter | Filter (inferred) | Drops 1 unit every | Full life (1000 units) | Manual's interval |
 |---|---|---|---|---|

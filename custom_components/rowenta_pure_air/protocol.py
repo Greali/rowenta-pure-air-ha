@@ -50,14 +50,14 @@ LIGHT_IDS: dict[str, int] = {name: ident for ident, name in LIGHTS.items()}
 # 1000 right after resetting the filter with the physical button, then it decreases with use.
 # The order of the filters is NOT confirmed.
 COUNTER_OFFSETS = (9, 13, 17, 21)
-# The counters count down from 1000 and only while the purifier is ON. Measured over ~10 h of use in auto mode:
+# The counters count down from 1000 and only while the purifier is ON. Measured over ~15 h of use in auto mode:
 # minutes of operation per counter unit. Counters 2 and 4 always moved together; counter 3 is exactly half as
 # fast. That matches the manual's intervals (activated carbon 12 months, Allergy+ 24 months), which is why the
 # counters are assigned to the filters as below. The assignment of 2 vs 4 (carbon / NanoCaptur) is a guess,
 # and all derived times are estimates.
 FILTER_NAMES = ("prefilter", "carbon", "allergy", "nanocaptur")
 COUNTER_FULL = 1000
-COUNTER_MINUTES_PER_UNIT = (20.8, 135.4, 270.7, 135.4)
+COUNTER_MINUTES_PER_UNIT = (20.5, 135.4, 270.7, 135.4)
 
 
 class RowentaError(Exception):
